@@ -34,6 +34,12 @@ export default async function AppLayout( {
 						>
 							履歴
 						</Link>
+						<Link
+							href='/calendar'
+							className='text-sm font-medium text-gray-400 hover:text-gray-100'
+						>
+							カレンダー
+						</Link>
 						<LogoutButton />
 					</nav>
 				</div>

@@ -10,12 +10,17 @@ const geistSans = Geist( {
 export const metadata: Metadata = {
 	title: '頭痛ログ',
 	description: '頭痛の痛さを記録するアプリ',
+	appleWebApp: {
+		capable: true,
+		title: '頭痛ログ',
+		statusBarStyle: 'black-translucent',
+	},
 };
 
 export const viewport: Viewport = {
 	width: 'device-width',
 	initialScale: 1,
-	themeColor: '#ffffff',
+	themeColor: '#0d0d0d',
 };
 
 export default function RootLayout( {

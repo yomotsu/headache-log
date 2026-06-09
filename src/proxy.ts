@@ -33,7 +33,7 @@ export async function proxy( request: NextRequest ) {
 	const { data: { user } } = await supabase.auth.getUser();
 
 	const { pathname } = request.nextUrl;
-	const isAppRoute = pathname === '/log' || pathname.startsWith( '/log/' ) || pathname === '/history' || pathname.startsWith( '/history/' );
+	const isAppRoute = pathname === '/log' || pathname.startsWith( '/log/' ) || pathname === '/history' || pathname.startsWith( '/history/' ) || pathname === '/calendar' || pathname.startsWith( '/calendar/' );
 	const isApiRoute = pathname.startsWith( '/api/' );
 
 	if ( ! user && isAppRoute ) {
