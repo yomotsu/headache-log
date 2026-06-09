@@ -63,6 +63,7 @@ export default function PainLevelPad( { onLogged }: Props ) {
 				pain_level: level,
 				latitude: location?.latitude ?? null,
 				longitude: location?.longitude ?? null,
+				timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 			} ),
 		} );
 

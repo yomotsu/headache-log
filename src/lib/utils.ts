@@ -1,20 +1,26 @@
-export function formatDate( dateStr: string ): string {
+const DEFAULT_TZ = 'Asia/Tokyo';
+
+export function formatDate( dateStr: string, timezone?: string | null ): string {
 
 	const date = new Date( dateStr );
-	const options: Intl.DateTimeFormatOptions = {
+	return date.toLocaleDateString( 'ja-JP', {
+		timeZone: timezone ?? DEFAULT_TZ,
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
 		weekday: 'short',
-	};
-	return date.toLocaleDateString( 'ja-JP', options );
+	} );
 
 }
 
-export function formatTime( dateStr: string ): string {
+export function formatTime( dateStr: string, timezone?: string | null ): string {
 
 	const date = new Date( dateStr );
-	return date.toLocaleTimeString( 'ja-JP', { hour: '2-digit', minute: '2-digit' } );
+	return date.toLocaleTimeString( 'ja-JP', {
+		timeZone: timezone ?? DEFAULT_TZ,
+		hour: '2-digit',
+		minute: '2-digit',
+	} );
 
 }
 
@@ -42,7 +48,7 @@ export function painLevelDescription( level: number ): string {
 export function painLevelColor( level: number ): string {
 
 	const colors: Record<number, string> = {
-		0: 'bg-emerald-500 hover:bg-emerald-600 text-white',
+		0: 'bg-emerald-600 hover:bg-emerald-700 text-white',
 		1: 'bg-yellow-400 hover:bg-yellow-500 text-gray-900',
 		2: 'bg-orange-400 hover:bg-orange-500 text-white',
 		3: 'bg-orange-500 hover:bg-orange-600 text-white',
@@ -64,6 +70,26 @@ export function painLevelBadge( level: number ): string {
 		5: 'bg-red-800 text-red-200',
 	};
 	return colors[ level ] ?? 'bg-gray-800 text-gray-300';
+
+}
+
+export function weatherCodeLabel( code: number ): string {
+
+	if ( code === 0 ) return '快晴';
+	if ( code === 1 ) return '晴れ';
+	if ( code === 2 ) return '一部曇り';
+	if ( code === 3 ) return '曇り';
+	if ( code <= 48 ) return '霧';
+	if ( code <= 55 ) return '霧雨';
+	if ( code <= 57 ) return '凍霧雨';
+	if ( code <= 65 ) return '雨';
+	if ( code <= 67 ) return '凍雨';
+	if ( code <= 75 ) return '雪';
+	if ( code === 77 ) return '霰';
+	if ( code <= 82 ) return 'にわか雨';
+	if ( code <= 86 ) return 'にわか雪';
+	if ( code >= 95 ) return '雷雨';
+	return '不明';
 
 }
 

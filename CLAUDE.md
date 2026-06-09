@@ -31,7 +31,7 @@ src/
 │   ├── (app)/history/[id]/    # 詳細 + メモ編集 + 痛み度修正 + 削除
 │   ├── (app)/calendar/        # カレンダー（日ごとの最大痛み表示）
 │   ├── auth/callback/         # Supabase PKCEコールバック
-│   └── api/logs/              # POST（作成）/ [id] PATCH（memo, pain_level, recorded_at 更新）/ [id] DELETE
+│   └── api/logs/              # POST（作成）/ [id] PATCH（memo, pain_level, recorded_at 更新）/ [id] DELETE / [id]/weather POST（天気取得・保存）
 ├── components/
 │   ├── PainLevelPad.tsx       # 0〜5ボタン 3×2グリッド
 │   ├── PainLevelPadWrapper.tsx # クライアント側GPS取得ラッパー
@@ -43,12 +43,14 @@ src/
 │   ├── DeleteButton.tsx       # 削除ボタン + モーダル確認
 │   ├── CalendarView.tsx       # カレンダーUI（クライアントコンポーネント）
 │   ├── AuthForm.tsx           # Google OAuth + メール/パスワード
+│   ├── WeatherFetcher.tsx     # 詳細ページで天気未取得時にバックグラウンド取得するクライアントコンポーネント
 │   └── LogoutButton.tsx       # ログアウトボタン
 └── lib/
     ├── supabase/client.ts     # createBrowserClient（maxAge 400日）
     ├── supabase/server.ts     # createServerClient（cookies）
     ├── types.ts               # Log 型
-    └── utils.ts               # formatDate, painLevelColor, painLevelDescription 等
+    ├── weather.ts             # Open-Meteo API ラッパー（fetchWeather）
+    └── utils.ts               # formatDate, painLevelColor, painLevelDescription, weatherCodeLabel 等
 ```
 
 ## データベース
@@ -57,17 +59,26 @@ src/
 
 ```sql
 public.logs (
-  id          uuid PRIMARY KEY,
-  user_id     uuid REFERENCES auth.users,
-  pain_level  smallint CHECK (0-5),  -- 0 = 治まった
-  recorded_at timestamptz,
-  latitude    numeric(10,7),         -- nullable
-  longitude   numeric(10,7),         -- nullable
-  memo        text,                  -- nullable、後から追加可
-  created_at  timestamptz,
-  updated_at  timestamptz            -- trigger で自動更新
+  id           uuid PRIMARY KEY,
+  user_id      uuid REFERENCES auth.users,
+  pain_level   smallint CHECK (0-5),   -- 0 = 治まった
+  recorded_at  timestamptz,
+  latitude     numeric(10,7),          -- nullable
+  longitude    numeric(10,7),          -- nullable
+  memo         text,                   -- nullable、後から追加可
+  timezone     text NOT NULL DEFAULT 'Asia/Tokyo',  -- 記録時のブラウザタイムゾーン
+  temperature  numeric,                -- nullable（気温 °C）
+  pressure     numeric,                -- nullable（気圧 hPa）
+  weather_code smallint,               -- nullable（WMO天気コード）
+  created_at   timestamptz,
+  updated_at   timestamptz             -- trigger で自動更新
 )
 ```
+
+マイグレーション履歴:
+- `0001_initial.sql` — テーブル作成、RLS、インデックス
+- `0002_add_timezone.sql` — timezone カラム追加（NOT NULL DEFAULT 'Asia/Tokyo'）
+- `0003_add_weather.sql` — temperature / pressure / weather_code カラム追加
 
 RLSで自分のレコードのみ CRUD 可能。`user_id` はAPIルートのサーバー側でセッションから注入（クライアント送信なし）。
 
@@ -109,6 +120,26 @@ Server Component から `createClient()` を呼ぶと、Supabase がトークン
 
 input / textarea のフォントサイズが 16px 未満だと iOS が自動ズームする。
 Tailwind では `text-base`（16px）以上を使うこと。`text-sm`（14px）は NG。
+
+### タイムゾーンは記録時に保存する
+
+`Intl.DateTimeFormat().resolvedOptions().timeZone` をクライアントで取得し、POST 時にサーバーへ送って保存。
+`formatDate` / `formatTime` は第2引数に `log.timezone` を渡して表示する。
+Cloudflare Workers はシステムタイムゾーンが UTC のため、指定なしだと JST と9時間ずれる。
+
+### 天気は Open-Meteo API で取得する（無料・APIキー不要）
+
+`src/lib/weather.ts` の `fetchWeather(lat, lon, recordedAt)` を呼ぶ。
+- 90日以内: `https://api.open-meteo.com/v1/forecast?past_days=N`
+- 91日以上: `https://archive-api.open-meteo.com/v1/archive`
+- API に `timezone=UTC` を渡し、返却時刻を UTC として比較する
+- 記録・日時編集時に自動取得。失敗時は null のまま
+- 詳細ページ表示時に `WeatherFetcher` クライアントコンポーネントが weather=null かつ GPS ありなら再取得 → `router.refresh()`
+
+### Tailwind v4 で動的クラスが生成されない場合
+
+`utils.ts` など `.ts` ファイルで使う色クラスが他のファイルで未使用だと生成されないことがある。
+`globals.css` に `@source inline("クラス名パターン")` を追加して強制生成する。
 
 ### Supabase クエリの型
 

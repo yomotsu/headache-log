@@ -6,28 +6,54 @@ import { formatDate, formatTime } from '@/lib/utils';
 type Props = {
 	logId: string;
 	initialRecordedAt: string;
+	initialTimezone: string | null;
 };
 
-function toDatetimeLocalValue( isoString: string ): string {
+function toDatetimeLocalValue( isoString: string, timezone: string ): string {
 
-	const date = new Date( isoString );
-	const offset = date.getTimezoneOffset() * 60000;
-	const local = new Date( date.getTime() - offset );
-	return local.toISOString().slice( 0, 16 );
+	return new Intl.DateTimeFormat( 'sv-SE', {
+		timeZone: timezone,
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: false,
+	} ).format( new Date( isoString ) ).replace( ' ', 'T' );
 
 }
 
-export default function DateTimeEditor( { logId, initialRecordedAt }: Props ) {
+function fromDatetimeLocalValue( localValue: string, timezone: string ): string {
+
+	const naiveUTC = new Date( localValue + ':00Z' );
+	const tzLocalStr = new Intl.DateTimeFormat( 'sv-SE', {
+		timeZone: timezone,
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: false,
+	} ).format( naiveUTC ).replace( ' ', 'T' ) + ':00Z';
+
+	const diff = naiveUTC.getTime() - new Date( tzLocalStr ).getTime();
+	return new Date( naiveUTC.getTime() + diff ).toISOString();
+
+}
+
+export default function DateTimeEditor( { logId, initialRecordedAt, initialTimezone }: Props ) {
+
+	const tz = initialTimezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 	const [ recordedAt, setRecordedAt ] = useState( initialRecordedAt );
 	const [ editing, setEditing ] = useState( false );
-	const [ value, setValue ] = useState( toDatetimeLocalValue( initialRecordedAt ) );
+	const [ value, setValue ] = useState( toDatetimeLocalValue( initialRecordedAt, tz ) );
 	const [ saving, setSaving ] = useState( false );
 	const [ error, setError ] = useState( '' );
 
 	function handleEdit() {
 
-		setValue( toDatetimeLocalValue( recordedAt ) );
+		setValue( toDatetimeLocalValue( recordedAt, tz ) );
 		setError( '' );
 		setEditing( true );
 
@@ -41,14 +67,14 @@ export default function DateTimeEditor( { logId, initialRecordedAt }: Props ) {
 		const res = await fetch( `/api/logs/${logId}`, {
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify( { recorded_at: new Date( value ).toISOString() } ),
+			body: JSON.stringify( { recorded_at: fromDatetimeLocalValue( value, tz ) } ),
 		} );
 
 		setSaving( false );
 
 		if ( res.ok ) {
 
-			setRecordedAt( new Date( value ).toISOString() );
+			setRecordedAt( fromDatetimeLocalValue( value, tz ) );
 			setEditing( false );
 
 		} else {
@@ -94,7 +120,7 @@ export default function DateTimeEditor( { logId, initialRecordedAt }: Props ) {
 	return (
 		<div className='flex items-center gap-2'>
 			<p className='text-sm text-gray-500'>
-				{formatDate( recordedAt )} {formatTime( recordedAt )}
+				{formatDate( recordedAt, tz )} {formatTime( recordedAt, tz )}
 			</p>
 			<button
 				onClick={handleEdit}

@@ -10,6 +10,10 @@ export type Database = {
 					latitude: number | null;
 					longitude: number | null;
 					memo: string | null;
+					timezone: string | null;
+					temperature: number | null;
+					pressure: number | null;
+					weather_code: number | null;
 					created_at: string;
 					updated_at: string;
 				};

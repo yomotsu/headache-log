@@ -24,7 +24,7 @@ export default function LogEntry( { log }: { log: Log } ) {
 					)}
 				</div>
 			</div>
-			<span className='flex-shrink-0 text-sm text-gray-600'>{formatTime( log.recorded_at )}</span>
+			<span className='flex-shrink-0 text-sm text-gray-600'>{formatTime( log.recorded_at, log.timezone )}</span>
 		</Link>
 	);
 
