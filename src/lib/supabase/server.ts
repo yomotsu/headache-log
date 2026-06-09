@@ -17,9 +17,18 @@ export async function createClient() {
 				},
 				setAll( cookiesToSet ) {
 
-					cookiesToSet.forEach( ( { name, value, options } ) =>
-						cookieStore.set( name, value, options )
-					);
+					try {
+
+						cookiesToSet.forEach( ( { name, value, options } ) =>
+							cookieStore.set( name, value, options )
+						);
+
+					} catch {
+
+						// Server Component からの呼び出し時は書き込み不可のため無視する
+						// セッション更新はミドルウェアまたはルートハンドラが担う
+
+					}
 
 				},
 			},
