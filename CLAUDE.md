@@ -12,7 +12,7 @@
 - **@opennextjs/cloudflare v1.19.11** → Cloudflare Workers にデプロイ済み
 - **wrangler v4.98.0**
 
-## ディレクトリ構成
+## ディレクトリ構成（コンポーネント追加時は更新すること）
 
 ```
 src/
@@ -31,7 +31,7 @@ src/
 │   ├── (app)/history/[id]/    # 詳細 + メモ編集 + 痛み度修正 + 削除
 │   ├── (app)/calendar/        # カレンダー（日ごとの最大痛み表示）
 │   ├── auth/callback/         # Supabase PKCEコールバック
-│   └── api/logs/              # POST（作成）/ [id] PATCH（メモ更新）/ [id] DELETE
+│   └── api/logs/              # POST（作成）/ [id] PATCH（memo, pain_level, recorded_at 更新）/ [id] DELETE
 ├── components/
 │   ├── PainLevelPad.tsx       # 0〜5ボタン 3×2グリッド
 │   ├── PainLevelPadWrapper.tsx # クライアント側GPS取得ラッパー
@@ -39,6 +39,7 @@ src/
 │   ├── LogEntry.tsx           # 履歴カード
 │   ├── DayGroup.tsx           # 日付ヘッダー + LogEntryグループ
 │   ├── MemoEditor.tsx         # インラインメモ編集
+│   ├── DateTimeEditor.tsx     # 日時インライン編集（編集ボタン→入力→保存）
 │   ├── DeleteButton.tsx       # 削除ボタン + モーダル確認
 │   ├── CalendarView.tsx       # カレンダーUI（クライアントコンポーネント）
 │   ├── AuthForm.tsx           # Google OAuth + メール/パスワード
@@ -97,6 +98,17 @@ binding = "ASSETS"
 
 `incrementalCache`, `tagCache`, `queue` を `dummy` にし、`edgeExternals: ['node:crypto']` が必要。
 middleware には `external: true` と `wrapper: 'cloudflare-edge'` が必要。
+
+### server.ts の setAll は try/catch で囲む
+
+Server Component から `createClient()` を呼ぶと、Supabase がトークン更新時に `setAll` でクッキーを書こうとして
+"Cookies can only be modified in a Server Action or Route Handler" エラーが出る。
+`setAll` を try/catch で囲んで握り潰すことで解消。実際のトークン更新はミドルウェアやルートハンドラが担う。
+
+### iOS でフォーカス時に画面が拡大する
+
+input / textarea のフォントサイズが 16px 未満だと iOS が自動ズームする。
+Tailwind では `text-base`（16px）以上を使うこと。`text-sm`（14px）は NG。
 
 ### Supabase クエリの型
 
