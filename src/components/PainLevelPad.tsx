@@ -91,7 +91,7 @@ export default function PainLevelPad( { onLogged }: Props ) {
 						onClick={() => handlePress( level )}
 						disabled={loadingLevel !== null}
 						className={[
-							'flex min-h-[90px] flex-col items-center justify-start rounded-2xl px-3 pt-4 pb-3 transition-transform active:scale-95 disabled:opacity-60',
+							'flex min-h-[90px] flex-col items-center justify-start rounded-2xl px-2 pt-4 pb-3 transition-transform active:scale-95 disabled:opacity-60',
 							painLevelColor( level ),
 						].join( ' ' )}
 					>

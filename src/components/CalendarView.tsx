@@ -44,8 +44,7 @@ export default function CalendarView() {
 				.from( 'logs' )
 				.select( 'pain_level, recorded_at' )
 				.gte( 'recorded_at', from )
-				.lte( 'recorded_at', to )
-				.gt( 'pain_level', 0 );
+				.lte( 'recorded_at', to );
 
 			const map: Record<string, number> = {};
 			for ( const log of data ?? [] ) {

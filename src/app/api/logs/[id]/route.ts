@@ -17,9 +17,9 @@ export async function PATCH(
 
 	const { id } = await params;
 	const body = await request.json();
-	const { memo, pain_level } = body;
+	const { memo, pain_level, recorded_at } = body;
 
-	const update: { memo?: string | null; pain_level?: number } = {};
+	const update: { memo?: string | null; pain_level?: number; recorded_at?: string } = {};
 	if ( 'memo' in body ) update.memo = memo ?? null;
 	if ( 'pain_level' in body ) {
 
@@ -29,6 +29,17 @@ export async function PATCH(
 
 		}
 		update.pain_level = pain_level;
+
+	}
+	if ( 'recorded_at' in body ) {
+
+		const ts = Date.parse( recorded_at );
+		if ( isNaN( ts ) ) {
+
+			return NextResponse.json( { error: 'Invalid recorded_at' }, { status: 400 } );
+
+		}
+		update.recorded_at = new Date( ts ).toISOString();
 
 	}
 

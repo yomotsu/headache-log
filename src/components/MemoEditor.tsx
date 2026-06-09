@@ -48,8 +48,8 @@ export default function MemoEditor( { logId, initialMemo }: Props ) {
 				value={memo}
 				onChange={( e ) => { setMemo( e.target.value ); setSaved( false ); }}
 				rows={4}
-				placeholder='気になること、食事、天気など...'
-				className='w-full resize-none rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:border-gray-600 focus:outline-none focus:ring-1 focus:ring-gray-600'
+				placeholder='症状、気になること、食事、天気など...'
+				className='w-full resize-none rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-base text-gray-200 placeholder-gray-600 focus:border-gray-600 focus:outline-none focus:ring-1 focus:ring-gray-600'
 			/>
 			<div className='flex items-center gap-3'>
 				<button

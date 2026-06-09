@@ -16,7 +16,7 @@ export default async function AppLayout( {
 
 	return (
 		<div className='flex min-h-screen flex-col'>
-			<header className='sticky top-0 z-10 border-b border-gray-800 bg-gray-950'>
+			<header className='border-b border-gray-800 bg-gray-950'>
 				<div className='mx-auto flex max-w-lg items-center justify-between px-4 py-3'>
 					<Link href='/log' className='text-lg font-bold text-gray-100'>
 						頭痛ログ

@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { formatDate, formatTime, painLevelBadge } from '@/lib/utils';
+import { painLevelBadge } from '@/lib/utils';
 import MemoEditor from '@/components/MemoEditor';
 import PainLevelEditor from '@/components/PainLevelEditor';
+import DateTimeEditor from '@/components/DateTimeEditor';
 import DeleteButton from '@/components/DeleteButton';
 import Link from 'next/link';
 import type { Log } from '@/lib/types';
@@ -46,9 +47,7 @@ export default async function LogDetailPage( {
 						{log.pain_level}
 					</span>
 					<div>
-						<p className='text-sm text-gray-500'>
-							{formatDate( log.recorded_at )} {formatTime( log.recorded_at )}
-						</p>
+						<DateTimeEditor logId={log.id} initialRecordedAt={log.recorded_at} />
 					</div>
 				</div>
 				{( log.latitude !== null && log.longitude !== null ) && (
