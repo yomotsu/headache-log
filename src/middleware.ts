@@ -10,7 +10,7 @@ function hasAuthCookie( request: NextRequest ): boolean {
 
 }
 
-export function proxy( request: NextRequest ) {
+export function middleware( request: NextRequest ) {
 
 	const { pathname } = request.nextUrl;
 
