@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
@@ -143,6 +144,13 @@ export default function AuthForm( { mode }: { mode: Mode } ) {
 			>
 				{loading ? '処理中...' : mode === 'signup' ? 'アカウントを作成' : 'ログイン'}
 			</button>
+			{mode === 'login' && (
+				<p className='text-center text-sm text-gray-500'>
+					<Link href='/forgot-password' className='font-medium text-blue-400 hover:underline'>
+						パスワードをお忘れですか？
+					</Link>
+				</p>
+			)}
 		</form>
 		</div>
 	);

@@ -5,6 +5,9 @@ export async function GET( request: Request ) {
 
 	const { searchParams, origin } = new URL( request.url );
 	const code = searchParams.get( 'code' );
+	const next = searchParams.get( 'next' );
+
+	const safeNext = next && next.startsWith( '/' ) && ! next.startsWith( '//' ) ? next : '/log';
 
 	if ( code ) {
 
@@ -13,7 +16,7 @@ export async function GET( request: Request ) {
 
 		if ( ! error ) {
 
-			return NextResponse.redirect( `${origin}/log` );
+			return NextResponse.redirect( `${origin}${safeNext}` );
 
 		}
 

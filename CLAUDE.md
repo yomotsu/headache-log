@@ -25,6 +25,8 @@ src/
 │   ├── favicon.ico            # 32×32
 │   ├── (auth)/login/          # ログインページ
 │   ├── (auth)/signup/         # サインアップページ
+│   ├── (auth)/forgot-password/ # パスワード再設定メール送信
+│   ├── (auth)/reset-password/ # 新パスワード設定（メールリンクから到達）
 │   ├── (app)/layout.tsx       # アプリシェル（ナビ）
 │   ├── (app)/log/             # メイン画面（痛さボタン）
 │   ├── (app)/history/         # 履歴一覧
@@ -42,7 +44,9 @@ src/
 │   ├── DateTimeEditor.tsx     # 日時インライン編集（編集ボタン→入力→保存）
 │   ├── DeleteButton.tsx       # 削除ボタン + モーダル確認
 │   ├── CalendarView.tsx       # カレンダーUI（クライアントコンポーネント）
-│   ├── AuthForm.tsx           # Google OAuth + メール/パスワード
+│   ├── AuthForm.tsx           # Google OAuth + メール/パスワード（loginモードでパスワード忘れリンク表示）
+│   ├── ForgotPasswordForm.tsx # パスワード再設定メール送信フォーム
+│   ├── ResetPasswordForm.tsx  # 新パスワード設定フォーム（リカバリーセッション必須）
 │   ├── WeatherFetcher.tsx     # 詳細ページで天気未取得時にバックグラウンド取得するクライアントコンポーネント
 │   └── LogoutButton.tsx       # ログアウトボタン
 └── lib/
